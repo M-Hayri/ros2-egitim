@@ -37,11 +37,13 @@ Kodu sen yazarsın; yapay zekâya kod yazdırmak yok. Bir hata mesajını anlama
 .github/workflows/    build.yml (devcontainer içinde derleme ve testler),
                       content.yml (içerik denetimi), pages.yml (site yayını)
 docs/                 Sitenin içeriği (MkDocs Material)
-  seviye-0/ … seviye-6/, bitirme/, sozluk/, widgets/
+  seviye-0/ … seviye-6/, bitirme/, sozluk/, katki/
+  assets/egitim/      Widget ve soru bileşenleri: tek JS (egitim.js), tek CSS (egitim.css)
 dersler/              Her dersin başlangıç paketi ve testleri (çözüm kodu burada tutulmaz)
 ariza-lab/            Bilerek bozulmuş örnekler
 sablonlar/            Ders sayfası şablonu
 scripts/              Ortam kontrolü ve CI betikleri
+tests/tarayici/       Widget ve soru bileşenlerinin tarayıcı testleri (Playwright, Chromium)
 ```
 
 ## Siteyi yerelde derlemek
@@ -50,6 +52,17 @@ scripts/              Ortam kontrolü ve CI betikleri
 pip install -r requirements-docs.txt
 mkdocs serve
 ```
+
+Widget ve soru bileşenlerinin tarayıcı testleri (Chromium):
+
+```bash
+pip install -r requirements-docs.txt -r requirements-test.txt
+python -m playwright install --with-deps chromium
+mkdocs build --strict
+python -m pytest tests/tarayici -v
+```
+
+Ekran görüntüleri `tests/tarayici/ekran/` klasörüne yazılır.
 
 ## Katkı
 

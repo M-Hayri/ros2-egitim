@@ -34,7 +34,12 @@ theme:
         name: Açık temaya geç
 
 extra_css:
-  - stylesheets/egitim.css
+  - assets/egitim/egitim.css
+
+# Widget ve soru bileşenleri. navigation.instant bilerek kapalı:
+# sayfa geçişlerinde betik her sayfada baştan çalışır.
+extra_javascript:
+  - assets/egitim/egitim.js
 
 markdown_extensions:
   - admonition
@@ -62,3 +67,5 @@ nav:
   - Seviye 6 · Simülasyon: seviye-6/index.md
   - Bitirme projesi: bitirme/index.md
   - Sözlük: sozluk/index.md
+  - Katkı:
+      - Bileşen kataloğu: katki/bilesenler.md
