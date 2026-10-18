@@ -191,3 +191,35 @@ def test_soru_kimlikleri_site_genelinde_tek():
             gorulen.setdefault(k, []).append(s.name)
     cift = {k: v for k, v in gorulen.items() if len(v) > 1}
     assert cift == {}, cift
+
+
+# ---------- Soru seçenekleri: uzunluk ipucu (bağımsız inceleme, 19 Ekim 2026) ----------
+
+UZUNLUK_ORANI = 1.5
+SORU_BLOGU = re.compile(r'<div class="egitim-soru"(?P<oz>[^>]*)>(?P<govde>.*?)</div>', re.S)
+
+
+def sorulari_topla():
+    """(kaynak, kimlik, doğru sıra, seçenek metinleri) — banka ve sayfa içi sorular."""
+    sorular = []
+    for dosya in list(SORULAR.glob("*.md")) + list(DOCS.rglob("*.md")):
+        metin = re.sub(r"```.*?```", "", dosya.read_text(encoding="utf-8"), flags=re.S)
+        for m in SORU_BLOGU.finditer(metin):
+            kimlik = re.search(r'data-soru-id="([^"]+)"', m.group("oz")).group(1)
+            dogru = int(re.search(r'data-dogru="(\d+)"', m.group("oz")).group(1))
+            secenekler = re.findall(r"^\d+\.\s+(.+)$", m.group("govde"), re.M)
+            sorular.append((dosya.name, kimlik, dogru, [duz_metin(s).strip() for s in secenekler]))
+    return sorular
+
+
+SORU_LISTESI = sorulari_topla()
+
+
+@pytest.mark.parametrize("kaynak,kimlik,dogru,secenekler", SORU_LISTESI, ids=[s[1] for s in SORU_LISTESI])
+def test_dogru_secenek_uzunluguyla_ele_verilmiyor(kaynak, kimlik, dogru, secenekler):
+    uzunluk = [len(s) for s in secenekler]
+    dogru_u = uzunluk[dogru - 1]
+    yanlis_en_uzun = max(u for i, u in enumerate(uzunluk) if i != dogru - 1)
+    oran = dogru_u / yanlis_en_uzun
+    print(f"[uzunluk] {kimlik}: doğru {dogru_u}, yanlışların en uzunu {yanlis_en_uzun}, oran {oran:.2f}")
+    assert oran <= UZUNLUK_ORANI, f"{kimlik} ({kaynak}): doğru seçenek {oran:.2f} kat uzun"

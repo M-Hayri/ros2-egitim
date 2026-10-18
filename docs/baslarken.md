@@ -30,7 +30,7 @@ ROS'un pencereli programları (kaplumbağa simülatörü, rqt) Codespace'in içi
 1. Alt paneldeki sekmelerden **Ports**'a tıkla. Sekme, Terminal'in yanındadır.
 2. Listede **6080** numaralı portu bul; etiketi **Masaüstü (noVNC)**.
 3. Satırın üzerine gel ve **tarayıcıda aç** (küre) simgesine bas. Yeni bir sekmede noVNC sayfası açılır.
-4. noVNC sayfasında **Connect**'e bas. Parola sorulursa `ros` yaz. Boş bir masaüstü görürsün.
+4. noVNC sayfasında **Connect**'e bas. Parola sorulursa `ros` yaz. Boş bir masaüstü görürsün. **Connect** düğmesi çıkmazsa masaüstü zaten açılmıştır; bir sonraki adıma geç.
 5. Codespace sekmesine dön ve terminalde kaplumbağa penceresini aç:
 
     <!-- test: arka-plan; hazir: ros2 node list; desen: ^/turtlesim$; sure: 60 -->

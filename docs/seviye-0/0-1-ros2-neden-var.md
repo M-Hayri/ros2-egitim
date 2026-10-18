@@ -14,7 +14,7 @@ Bir depoda paket taşıyan küçük bir teslimat robotu düşün. Kamerası gör
 
 **ROS 2 bir ara katmandır.** Resmi tanıma göre ROS 2, farklı süreçler (çalışan programlar) arasında mesaj alışverişini sağlayan bir yayınla/abone ol mekanizmasına dayanır ([Basic concepts](https://docs.ros.org/en/jazzy/Concepts/Basic.html)). Kısacası robot yazılımını tek bir dev program olarak değil, birbiriyle mesajlaşan küçük programlar olarak yazmanın altyapısını verir.
 
-**Node.** Bu küçük programların her birine *node* denir. Node, ROS grafiğinin bir katılımcısıdır ve her node'un *tek bir mantıksal iş* yapması önerilir ([About nodes](https://docs.ros.org/en/jazzy/Concepts/Basic/About-Nodes.html)). Node'lar aynı süreçte, farklı süreçlerde ya da farklı makinelerde çalışıp birbirleriyle konuşabilir (aynı sayfa).
+**Node.** Bu küçük programların her birine *node* denir. Node, ROS grafiğinin bir katılımcısıdır ve her node'un *tek bir mantıksal iş* yapması önerilir ([About nodes](https://docs.ros.org/en/jazzy/Concepts/Basic/About-Nodes.html); aynı öneri [Understanding nodes](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes/Understanding-ROS2-Nodes.html) eğitiminde de geçer). Node'lar aynı süreçte, farklı süreçlerde ya da farklı makinelerde çalışıp birbirleriyle konuşabilir (aynı sayfa).
 
 **ROS grafiği.** Bir ROS sistemindeki node'ların ve aralarındaki iletişim bağlantılarının oluşturduğu ağa *ROS grafiği* denir ([Basic concepts](https://docs.ros.org/en/jazzy/Concepts/Basic.html)). Toplantıda tahtaya çizeceğimiz şey budur: kutular node'lar, oklar aralarında akan veri.
 
@@ -115,6 +115,7 @@ Bu derste yok. Kavram dersi; ilk arıza laboratuvarı Ders 0.2'de.
 
 - [Basic concepts](https://docs.ros.org/en/jazzy/Concepts/Basic.html)
 - [About nodes](https://docs.ros.org/en/jazzy/Concepts/Basic/About-Nodes.html)
+- [Understanding nodes](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes/Understanding-ROS2-Nodes.html) (Ders 1.1'in konusu)
 - [About client libraries](https://docs.ros.org/en/jazzy/Concepts/Basic/About-Client-Libraries.html)
 - [About different middleware vendors](https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Different-Middleware-Vendors.html)
 - [Distributions](https://docs.ros.org/en/jazzy/Releases.html) ve [Release schedule](https://docs.ros.org/en/jazzy/The-ROS2-Project/Release-Schedule.html)

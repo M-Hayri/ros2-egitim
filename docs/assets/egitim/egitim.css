@@ -386,6 +386,39 @@
   margin: 0.5rem 0 0;
 }
 
+/* Node grafiği listesi: ad ve durum solda alt alta, "Yeniden başlat" sağda sabit
+   genişlikte bir sütunda. Düğme yalnızca node çökmüşken görünür (görünür = etkin);
+   yer tutmaya devam ettiği için satırlar her genişlikte aynı hizada kalır. */
+.eg-durum-listesi li.eg-satir-dugmeli {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6.75rem;
+  grid-template-areas:
+    "ad dugme"
+    "durum dugme";
+  align-items: center;
+  gap: 0.1rem 0.6rem;
+}
+
+.eg-satir-dugmeli > .eg-parca-adi {
+  grid-area: ad;
+}
+
+.eg-satir-dugmeli > .eg-durum {
+  grid-area: durum;
+  margin-left: 0;
+  text-align: left;
+}
+
+.eg-satir-dugmeli > .eg-dugme {
+  grid-area: dugme;
+  justify-self: stretch;
+  justify-content: center;
+}
+
+.eg-satir-dugmeli > .eg-dugme[disabled] {
+  visibility: hidden;
+}
+
 .eg-dugme--kucuk {
   min-height: 1.8rem;
   padding: 0.15rem 0.5rem;

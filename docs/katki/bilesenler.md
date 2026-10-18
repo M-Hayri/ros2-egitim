@@ -39,9 +39,9 @@ Açıklama metni buraya.
 <div class="egitim-soru" data-soru-id="katalog-tahmin" data-tur="tahmin" data-dogru="2" markdown>
 Teslimat robotunun beş node'undan `kamera` çökerse öteki dört node ne yapar?
 
-1. Hepsi hemen durur.
+1. Hepsi hemen durur; tek bir node çökünce ROS bütün sistemi kapatır.
 2. Kendi süreçlerinde çalışmaya devam eder; kameradan veri bekleyenlere veri gelmez.
-3. Kamera kendiliğinden yeniden başlar, kimse fark etmez.
+3. Kamera kendiliğinden yeniden başlar; öteki node'lar hiçbir şey fark etmez.
 
 Node'lar ayrı süreçlerde çalıştığı için birinin çökmesi ötekileri kapatmaz. Ama kameranın yayınladığı veriyi dinleyen node'lar artık yeni mesaj almaz. Yeniden başlatma kendiliğinden olmaz; bunu launch dosyasında ayrıca istemek gerekir (Seviye 3).
 </div>

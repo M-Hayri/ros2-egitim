@@ -230,3 +230,50 @@ def test_s6_lejant_ve_akan_ok_kontrasti(sayfa_ac, tema):
     assert lejant >= 4.5, f"lejant {lejant:.2f}:1"
     assert ok >= 3.0, f"akan ok {ok:.2f}:1"
     assert s.konsol_hatalari == []
+
+
+# ---------- Bağımsız inceleme (19 Ekim 2026): "Yeniden başlat" düğmelerinin düzeni ----------
+
+
+def _dugme_olcumu(p):
+    return p.evaluate(
+        """() => [...document.querySelectorAll('[data-model="node-grafigi"] button[data-yeniden]')].map(b => {
+             const r = b.getBoundingClientRect(), panel = b.closest('.eg-panel').getBoundingClientRect();
+             return {parca: b.dataset.yeniden, gorunur: getComputedStyle(b).visibility === 'visible',
+                     etkin: !b.disabled, sol: Math.round(r.left), sag: Math.round(r.right),
+                     genislik: Math.round(r.width), panelSag: Math.round(panel.right)};
+           })"""
+    )
+
+
+@pytest.mark.parametrize("genislik", [1280, 375])
+def test_yeniden_baslat_gorunur_ise_etkin_ve_hizali(sayfa_ac, genislik):
+    s = sayfa_ac(genislik=genislik, yukseklik=900).ac()
+    p = s.page
+    # Başlangıç: hiçbir düğme görünmez.
+    assert [d["gorunur"] for d in _dugme_olcumu(p)] == [False] * 5
+    # Biri çökünce yalnızca onun düğmesi görünür ve etkin.
+    _cokert(p, "algilama")
+    for d in _dugme_olcumu(p):
+        assert d["gorunur"] == d["etkin"] == (d["parca"] == "algilama"), d
+    # Hepsi çökünce beşi de görünür; aynı sütunda, aynı genişlikte, panelin içinde.
+    _cokert(p, "kamera", "planlayici", "motor", "kayitci")
+    olcum = _dugme_olcumu(p)
+    assert all(d["gorunur"] and d["etkin"] for d in olcum), olcum
+    assert len({d["sol"] for d in olcum}) == 1, olcum
+    assert len({d["genislik"] for d in olcum}) == 1, olcum
+    assert all(d["sag"] <= d["panelSag"] for d in olcum), olcum
+    assert s.konsol_hatalari == []
+
+
+def test_ozet_birden_fazla_cokmede_hepsini_sayar(sayfa_ac):
+    """Ekran görüntüsünden bulundu (19 Ekim): özet yalnızca son çökeni sayıyordu."""
+    s = sayfa_ac().ac()
+    p = s.page
+    _cokert(p, "algilama", "kayitci")
+    ozet = p.inner_text(".eg-ozet")
+    assert "yalnızca kayitci durdu" not in ozet, ozet
+    assert "algilama, kayitci" in ozet, ozet
+    # Birden fazla çökük node varken öneri hepsini kapsamalı (tek çökmenin S4 cümlesi ayrı testte).
+    assert "yalnızca çöken node'ları (algilama, kayitci) yeniden başlatman yeter" in ozet, ozet
+    assert s.konsol_hatalari == []

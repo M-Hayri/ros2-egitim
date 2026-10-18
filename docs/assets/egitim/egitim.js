@@ -467,7 +467,7 @@
         "aria-label": parca.ad + " node'unu yeniden başlat",
         metin: "Yeniden başlat",
       });
-      var satir = ogeYap("li", { "data-parca": parca.kimlik }, [
+      var satir = ogeYap("li", { "data-parca": parca.kimlik, sinif: "eg-satir-dugmeli" }, [
         ogeYap("span", { sinif: "eg-parca-adi", metin: parca.ad }),
         durum,
         yeniden,
@@ -548,11 +548,19 @@
       ciz();
       var ad = parcaBul(secili).ad;
       var veriYok = etkilenenler();
+      var duranlar = TNG_PARCALAR.filter(function (p) {
+        return cokenler[p.kimlik];
+      }).map(function (p) {
+        return p.ad;
+      });
       ozet.textContent =
         ad + " çöktü. Tek programda bu hata bütün süreci kapattı: beş parçanın beşi durdu ve ancak program baştan başlatılınca geri gelir. " +
-        "Node grafiğinde çökme öteki süreçlere yayılmadı: yalnızca " + ad + " durdu" +
+        "Node grafiğinde çökme öteki süreçlere yayılmadı: " +
+        (duranlar.length > 1 ? "yalnızca çöken node'lar durdu (" + duranlar.join(", ") + ")" : "yalnızca " + ad + " durdu") +
         (veriYok.length ? "; " + veriYok.join(", ") + " çalışıyor ama veri alamıyor" : "; öteki node'lar hiç etkilenmedi") +
-        ". Orada yalnızca " + ad + " node'unu yeniden başlatman yeter.";
+        (duranlar.length > 1
+          ? ". Orada yalnızca çöken node'ları (" + duranlar.join(", ") + ") yeniden başlatman yeter."
+          : ". Orada yalnızca " + ad + " node'unu yeniden başlatman yeter.");
     });
 
     grafListe.addEventListener("click", function (olay) {
