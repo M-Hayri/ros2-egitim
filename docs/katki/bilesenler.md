@@ -32,7 +32,7 @@ Açıklama metni buraya.
 </div>
 ```
 
-`data-tur` iki değer alır: `tahmin` (Tahmin et adımı) ve `hatirla` (Hatırla adımı). Cevaplar not etkisi olmayan öz yoklamadır; yalnızca kişinin kendi tarayıcısında tutulur. Tarayıcı depolaması kapalıysa soru yine çalışır, yalnızca cevabı hatırlamaz.
+`data-tur` üç değer alır: `tahmin` (Tahmin et adımı), `hatirla` (Hatırla adımı) ve `yoklama` (ders dışı öz yoklama, örneğin "Hazır mısın?" sayfası). Cevaplar not etkisi olmayan öz yoklamadır; yalnızca kişinin kendi tarayıcısında tutulur. Tarayıcı depolaması kapalıysa soru yine çalışır, yalnızca cevabı hatırlamaz.
 
 ### Örnek: tahmin sorusu
 

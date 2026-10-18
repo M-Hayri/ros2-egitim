@@ -57,6 +57,11 @@
   box-sizing: border-box;
 }
 
+/* hidden niteliği, display tanımlayan sınıfların (ör. .eg-dugme) önüne geçmeli. */
+.eg-kutu [hidden] {
+  display: none !important;
+}
+
 .eg-etiket {
   display: inline-block;
   margin-bottom: 0.5rem;

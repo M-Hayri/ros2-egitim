@@ -107,7 +107,7 @@
 
   /* ---------- Soru bileşeni ---------- */
 
-  var TUR_ETIKETI = { tahmin: "Tahmin et", hatirla: "Hatırla" };
+  var TUR_ETIKETI = { tahmin: "Tahmin et", hatirla: "Hatırla", yoklama: "Öz yoklama" };
   var HARFLER = "ABCDEFGH";
   var gorulenSoruKimlikleri = {};
 
