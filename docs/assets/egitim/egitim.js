@@ -15,6 +15,15 @@
  *     Açıklama: cevaptan sonra görünen her şey (ilk listeden sonraki öğeler).
  *     </div>
  *
+ *   Soru bankası: sorular/<kimlik>.md dosyası tam soru div'ini taşır; sayfaya
+ *     --8<-- "<kimlik>.md"
+ *   satırıyla eklenir (pymdownx.snippets, derleme anında; ağ isteği yok).
+ *   Sonraki dersin açılışındaki tekrar: aynı satır bir kabın içinde:
+ *     <div class="egitim-tekrar" markdown>
+ *     --8<-- "<kimlik>.md"
+ *     </div>
+ *   Tekrar kabındaki soru dolu gelmez ve cevabı kaydetmez.
+ *
  * Soru cevapları yalnızca kişinin tarayıcısında (localStorage) tutulur.
  * Depolama engelliyse bileşen yine çalışır, yalnızca cevabı hatırlamaz.
  * Yeni widget eklemek için: widgetKaydet("ad", function (kok) { ... }).
@@ -108,10 +117,14 @@
     var dogru = parseInt(kok.getAttribute("data-dogru"), 10);
 
     if (!kimlik) return hataGoster(kok, "data-soru-id eksik.");
-    if (gorulenSoruKimlikleri[kimlik]) {
+    // Tekrar kabındaki soru (sonraki dersin açılışı): kayıtlı cevapla dolu gelmez,
+    // cevabı kaydetmez, asıl dersteki kayda dokunmaz.
+    var tekrarMi = !!kok.closest(".egitim-tekrar");
+    var sayfaKimligi = kimlik + (tekrarMi ? "--tekrar" : "");
+    if (gorulenSoruKimlikleri[sayfaKimligi]) {
       return hataGoster(kok, "Aynı sayfada iki kez kullanılan soru kimliği: " + kimlik);
     }
-    gorulenSoruKimlikleri[kimlik] = true;
+    gorulenSoruKimlikleri[sayfaKimligi] = true;
     if (!TUR_ETIKETI[tur]) return hataGoster(kok, "Bilinmeyen soru türü: " + tur);
 
     var cocuklar = Array.prototype.slice.call(kok.children);
@@ -130,7 +143,7 @@
       return hataGoster(kok, kimlik + ": data-dogru 1 ile " + secenekler.length + " arasında olmalı.");
     }
 
-    var soruMetni = ogeYap("div", { sinif: "eg-soru-metni", id: "eg-soru-" + kimlik });
+    var soruMetni = ogeYap("div", { sinif: "eg-soru-metni", id: "eg-soru-" + sayfaKimligi });
     cocuklar.slice(0, listeSirasi).forEach(function (oge) {
       soruMetni.appendChild(oge);
     });
@@ -142,7 +155,7 @@
     var grup = ogeYap("div", {
       sinif: "eg-secenekler",
       role: "group",
-      "aria-labelledby": "eg-soru-" + kimlik,
+      "aria-labelledby": "eg-soru-" + sayfaKimligi,
     });
     var dugmeler = secenekler.map(function (li, sira) {
       var icerik = ogeYap("span");
@@ -168,7 +181,8 @@
 
     kok.textContent = "";
     kok.classList.add("eg-kutu", "eg-soru");
-    kok.appendChild(ogeYap("span", { sinif: "eg-etiket", metin: TUR_ETIKETI[tur] }));
+    if (tekrarMi) kok.setAttribute("data-mod", "tekrar");
+    kok.appendChild(ogeYap("span", { sinif: "eg-etiket", metin: tekrarMi ? "Tekrar" : TUR_ETIKETI[tur] }));
     [soruMetni, grup, geriBildirim, aciklama, tekrar, not].forEach(function (oge) {
       kok.appendChild(oge);
     });
@@ -214,6 +228,10 @@
       if (!dugme || dugme.disabled) return;
       var secim = parseInt(dugme.getAttribute("data-secenek"), 10);
       goster(secim);
+      if (tekrarMi) {
+        not.textContent = "Tekrar sorusu: cevabın kaydedilmez, her gelişinde yeniden sorulur.";
+        return;
+      }
       var kaydedildi = depo.yaz("soru:" + kimlik, { secim: secim });
       not.textContent = kaydedildi
         ? "Cevabın yalnızca bu tarayıcıda saklanır."
@@ -221,12 +239,12 @@
     });
 
     tekrar.addEventListener("click", function () {
-      depo.sil("soru:" + kimlik);
+      if (!tekrarMi) depo.sil("soru:" + kimlik);
       sifirla();
       dugmeler[0].focus();
     });
 
-    var kayitli = depo.oku("soru:" + kimlik);
+    var kayitli = tekrarMi ? null : depo.oku("soru:" + kimlik);
     if (kayitli && kayitli.secim >= 1 && kayitli.secim <= secenekler.length) {
       goster(kayitli.secim);
       not.textContent = "Daha önce verdiğin cevap. Değiştirmek için Tekrar dene.";
