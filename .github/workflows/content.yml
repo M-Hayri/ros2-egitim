@@ -1,0 +1,27 @@
+# İçerik denetimi. A0'da yalnızca siteyi katı modda derler.
+# A2'den itibaren: ders sayfalarındaki komut bloklarını devcontainer içinde çalıştıracak
+# ve resmi doküman bağlantılarını kontrol edecek.
+name: İçerik denetimi
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - ".github/workflows/content.yml"
+  workflow_dispatch:
+
+jobs:
+  site:
+    name: Siteyi katı modda derle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Bağımlılıklar
+        run: pip install -r requirements-docs.txt
+      - name: mkdocs build --strict
+        run: mkdocs build --strict

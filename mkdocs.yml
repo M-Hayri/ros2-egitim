@@ -1,0 +1,64 @@
+site_name: Mavi Gölge ROS 2 Eğitimi
+site_description: ROS 2'yi uygulayarak öğrenmek için açık kaynak, etkileşimli eğitim.
+site_author: Mavi Gölge Yazılım Ekibi
+# Depo adresi belli olunca scripts/depo_adini_ayarla.sh bu satırları doldurur.
+# repo_url: https://github.com/SAHIP/DEPO
+# edit_uri: edit/main/docs/
+
+copyright: Kod MIT, içerik CC BY 4.0 lisanslıdır.
+
+theme:
+  name: material
+  language: tr
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.footer
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Koyu temaya geç
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Açık temaya geç
+
+extra_css:
+  - stylesheets/egitim.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+nav:
+  - Ana sayfa: index.md
+  - Başlamadan önce: baslarken.md
+  - Seviye 0 · Giriş: seviye-0/index.md
+  - Seviye 1 · İletişim: seviye-1/index.md
+  - Seviye 2 · Etkileşim: seviye-2/index.md
+  - Seviye 3 · Sistem kurmak: seviye-3/index.md
+  - Seviye 4 · Uzay ve zaman: seviye-4/index.md
+  - Seviye 5 · Araç kutusu: seviye-5/index.md
+  - Seviye 6 · Simülasyon: seviye-6/index.md
+  - Bitirme projesi: bitirme/index.md
+  - Sözlük: sozluk/index.md

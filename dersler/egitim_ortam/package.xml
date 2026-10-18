@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>egitim_ortam</name>
+  <version>0.1.0</version>
+  <description>Yer tutucu paket: CI zincirinin (colcon build + test) çalıştığını doğrular. Ders içeriği değildir.</description>
+  <maintainer email="mavigolge@example.com">Mavi Gölge Yazılım Ekibi</maintainer>
+  <license>MIT</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>turtlesim</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

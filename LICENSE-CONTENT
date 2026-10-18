@@ -1,0 +1,13 @@
+Mavi Gölge ROS 2 Eğitimi — içerik lisansı
+
+Bu depodaki eğitim içeriği (docs/ ve sablonlar/ klasörlerindeki metinler, görseller
+ve etkileşimli gösterimlerin anlatım metinleri) Creative Commons Atıf 4.0 Uluslararası
+(CC BY 4.0) lisansı ile lisanslanmıştır.
+
+Copyright (c) 2026 Mavi Gölge Yazılım Ekibi
+
+Lisansın özeti:  https://creativecommons.org/licenses/by/4.0/deed.tr
+Lisansın tam metni: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Kaynak gösterilerek paylaşılabilir ve uyarlanabilir. Yazılım kodu (betikler, paketler,
+testler, widget kodları) bu lisansa değil, LICENSE dosyasındaki MIT lisansına tabidir.

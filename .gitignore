@@ -1,0 +1,13 @@
+# Derleme çıktıları
+build/
+install/
+log/
+# MkDocs çıktısı
+site/
+# Python
+__pycache__/
+*.pyc
+.venv/
+# Editör
+.vscode/
+*.swp

@@ -1,0 +1,6 @@
+/* Mavi Gölge ROS 2 Eğitimi — site genelindeki küçük stil ayarları.
+   Widget'ların ortak stili A1 aşamasında buraya eklenecek. */
+
+.md-typeset table:not([class]) {
+  font-size: 0.75rem;
+}

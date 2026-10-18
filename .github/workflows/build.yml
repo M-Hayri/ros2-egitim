@@ -1,0 +1,35 @@
+# Devcontainer imajını derler; içinde ortam kontrolünü, colcon build'i ve testleri çalıştırır.
+name: Ortam ve ders testleri
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".devcontainer/**"
+      - "dersler/**"
+      - "scripts/**"
+      - ".github/workflows/build.yml"
+  pull_request:
+    paths:
+      - ".devcontainer/**"
+      - "dersler/**"
+      - "scripts/**"
+      - ".github/workflows/build.yml"
+  workflow_dispatch:
+
+jobs:
+  devcontainer:
+    name: Devcontainer içinde derle ve test et
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v7
+
+      - name: Devcontainer'ı derle ve komutları çalıştır
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            bash scripts/ortam_kontrol.sh
+            bash scripts/ci_test.sh
