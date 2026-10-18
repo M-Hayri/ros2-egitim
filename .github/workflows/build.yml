@@ -20,7 +20,7 @@ on:
 jobs:
   devcontainer:
     name: Devcontainer içinde derle ve test et
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - name: Depoyu al
