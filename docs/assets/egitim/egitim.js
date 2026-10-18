@@ -287,10 +287,42 @@
       : "veri-gelmiyor";
   }
 
+  /* Sürüş zinciri: motor_surucu'dan geriye doğru. Robotun sürmesi için hepsi ayakta olmalı.
+     Birden fazla node çökmüşse robot metni motor_surucu'ya en yakın olanı adlandırır. */
+  var SURUS_ZINCIRI = ["motor", "planlayici", "algilama", "kamera"];
+
+  function grafRobotMetni(cokenler) {
+    var cokenZincir = SURUS_ZINCIRI.filter(function (k) {
+      return cokenler[k];
+    });
+    if (cokenZincir.length === 0) {
+      return cokenler.kayitci
+        ? { suruyor: true, metin: "Robot sürüyor: kayitci çalışmıyor ama sürüş zincirinde değil." }
+        : { suruyor: true, metin: "Robot sürüyor." };
+    }
+    var ilk = parcaBul(cokenZincir[0]);
+    if (ilk.kimlik === "motor") {
+      return { suruyor: false, metin: "Robot duruyor: motor_surucu çalışmıyor." };
+    }
+    return {
+      suruyor: false,
+      metin: "Robot duruyor: " + ilk.ad + " çalışmıyor, motor_surucu'ya komut gelmiyor.",
+    };
+  }
+
+  function hareketAzaltilmis() {
+    try {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function tekProgramNodeGrafigi(kok) {
     ornekSayaci += 1;
     var okKimligi = "eg-ok-" + ornekSayaci;
-    var cokenler = {};
+    var tekKapali = false; // tek program: bir parça çökünce bütün süreç kapanır
+    var cokenler = {}; // node grafiği: yalnızca çöken node'lar
     var secili = "kamera";
 
     kok.textContent = "";
@@ -300,7 +332,7 @@
       ogeYap("p", {
         sinif: "eg-not",
         metin:
-          "Aynı teslimat robotu iki şekilde yazılmış. Bir parça seç, Çökert'e bas ve iki modelde neyin durduğunu karşılaştır.",
+          "Aynı teslimat robotu iki şekilde yazılmış. Bir parça seç, Çökert'e bas; sonra iki modelde neyin durduğunu ve neyi yeniden başlatabildiğini karşılaştır.",
       })
     );
 
@@ -323,13 +355,7 @@
       "data-eylem": "cokert",
       metin: "Çökert",
     });
-    var sifirla = ogeYap("button", {
-      type: "button",
-      sinif: "eg-dugme",
-      "data-eylem": "sifirla",
-      metin: "Hepsini yeniden başlat",
-    });
-    kok.appendChild(ogeYap("div", { sinif: "eg-tng-kontroller" }, [secim, cokert, sifirla]));
+    kok.appendChild(ogeYap("div", { sinif: "eg-tng-kontroller" }, [secim, cokert]));
 
     /* Sol panel: tek program */
     var tekListe = ogeYap("ul", { sinif: "eg-durum-listesi" });
@@ -348,10 +374,17 @@
       tekListe,
     ]);
     var tekRobot = ogeYap("p", { sinif: "eg-robot" });
+    var tekYeniden = ogeYap("button", {
+      type: "button",
+      sinif: "eg-dugme",
+      "data-eylem": "program-yeniden",
+      metin: "Programı yeniden başlat",
+    });
     var solPanel = ogeYap("section", { sinif: "eg-panel", "data-model": "tek-program" }, [
       ogeYap("h4", { metin: "Tek program (tek süreç)" }),
       tekSurec,
       tekRobot,
+      ogeYap("p", { sinif: "eg-panel-eylem" }, [tekYeniden]),
     ]);
 
     /* Sağ panel: node grafiği */
@@ -398,22 +431,37 @@
       grafDugumleri[parca.kimlik] = { g: g, yazi: durumYazisi };
       svg.appendChild(g);
     });
+    var lejant = ogeYap("p", {
+      sinif: "eg-lejant",
+      metin: hareketAzaltilmis()
+        ? "Oklar: renkli = veri akıyor, soluk gri = veri akmıyor."
+        : "Oklar: renkli ve hareketli = veri akıyor, soluk gri = veri akmıyor.",
+    });
 
     var grafListe = ogeYap("ul", { sinif: "eg-durum-listesi" });
     var grafSatirlar = {};
     TNG_PARCALAR.forEach(function (parca) {
       var durum = ogeYap("span", { sinif: "eg-durum" });
+      var yeniden = ogeYap("button", {
+        type: "button",
+        sinif: "eg-dugme eg-dugme--kucuk",
+        "data-yeniden": parca.kimlik,
+        "aria-label": parca.ad + " node'unu yeniden başlat",
+        metin: "Yeniden başlat",
+      });
       var satir = ogeYap("li", { "data-parca": parca.kimlik }, [
         ogeYap("span", { sinif: "eg-parca-adi", metin: parca.ad }),
         durum,
+        yeniden,
       ]);
-      grafSatirlar[parca.kimlik] = { satir: satir, durum: durum };
+      grafSatirlar[parca.kimlik] = { satir: satir, durum: durum, yeniden: yeniden };
       grafListe.appendChild(satir);
     });
     var grafRobot = ogeYap("p", { sinif: "eg-robot" });
     var sagPanel = ogeYap("section", { sinif: "eg-panel", "data-model": "node-grafigi" }, [
       ogeYap("h4", { metin: "Node grafiği (beş ayrı süreç)" }),
       svg,
+      lejant,
       grafListe,
       grafRobot,
     ]);
@@ -429,52 +477,44 @@
       })
     );
 
-    function ciz() {
-      var herhangiCoktu = Object.keys(cokenler).length > 0;
+    function etkilenenler() {
+      return TNG_PARCALAR.filter(function (p) {
+        return nodeDurumu(p, cokenler) === "veri-gelmiyor";
+      }).map(function (p) {
+        return p.ad;
+      });
+    }
 
+    function ciz() {
       TNG_PARCALAR.forEach(function (parca) {
-        var tekDurum = herhangiCoktu ? "durdu" : "calisiyor";
+        var tekDurum = tekKapali ? "durdu" : "calisiyor";
         tekSatirlar[parca.kimlik].satir.setAttribute("data-durum", tekDurum);
         tekSatirlar[parca.kimlik].durum.textContent = DURUM_METNI[tekDurum];
 
         var durum = nodeDurumu(parca, cokenler);
-        grafSatirlar[parca.kimlik].satir.setAttribute("data-durum", durum);
-        grafSatirlar[parca.kimlik].durum.textContent = DURUM_METNI[durum];
+        var satir = grafSatirlar[parca.kimlik];
+        satir.satir.setAttribute("data-durum", durum);
+        satir.durum.textContent = DURUM_METNI[durum];
+        satir.yeniden.disabled = !cokenler[parca.kimlik];
         grafDugumleri[parca.kimlik].g.setAttribute("data-durum", durum);
         grafDugumleri[parca.kimlik].yazi.textContent = DURUM_KISA[durum];
 
-        var dugme = secimDugmeleri[parca.kimlik];
-        dugme.setAttribute("aria-pressed", parca.kimlik === secili ? "true" : "false");
+        secimDugmeleri[parca.kimlik].setAttribute("aria-pressed", parca.kimlik === secili ? "true" : "false");
       });
       kenarlar.forEach(function (kenar) {
         kenar.oge.setAttribute("data-akiyor", uretiyor(kenar.konu.kaynak, cokenler) ? "evet" : "hayir");
       });
 
-      tekSurec.setAttribute("data-durum", herhangiCoktu ? "durdu" : "calisiyor");
-      tekRobot.setAttribute("data-suruyor", herhangiCoktu ? "hayir" : "evet");
-      tekRobot.textContent = herhangiCoktu ? "Robot duruyor." : "Robot sürüyor.";
+      tekSurec.setAttribute("data-durum", tekKapali ? "durdu" : "calisiyor");
+      tekRobot.setAttribute("data-suruyor", tekKapali ? "hayir" : "evet");
+      tekRobot.textContent = tekKapali ? "Robot duruyor: bütün program kapandı." : "Robot sürüyor.";
+      tekYeniden.disabled = !tekKapali;
 
-      var suruyor = nodeDurumu(parcaBul("motor"), cokenler) === "veri-geliyor";
-      grafRobot.setAttribute("data-suruyor", suruyor ? "evet" : "hayir");
-      grafRobot.textContent = suruyor ? "Robot sürüyor." : "Robot duruyor.";
+      var robot = grafRobotMetni(cokenler);
+      grafRobot.setAttribute("data-suruyor", robot.suruyor ? "evet" : "hayir");
+      grafRobot.textContent = robot.metin;
 
-      cokert.disabled = !!cokenler[secili];
-    }
-
-    function ozetYaz(kimlik) {
-      var ad = parcaBul(kimlik).ad;
-      var etkilenen = TNG_PARCALAR.filter(function (p) {
-        return nodeDurumu(p, cokenler) === "veri-gelmiyor";
-      }).map(function (p) {
-        return p.ad;
-      });
-      var metin =
-        ad + " çöktü. Tek programda bütün süreç kapandı, beş parçanın hepsi durdu. " +
-        "Node grafiğinde yalnızca çöken node'lar durdu";
-      metin += etkilenen.length
-        ? "; " + etkilenen.join(", ") + " çalışıyor ama veri alamıyor."
-        : "; diğerleri hiç etkilenmedi.";
-      ozet.textContent = metin;
+      cokert.disabled = tekKapali && !!cokenler[secili];
     }
 
     secim.addEventListener("click", function (olay) {
@@ -483,15 +523,36 @@
       secili = dugme.getAttribute("data-parca");
       ciz();
     });
+
     cokert.addEventListener("click", function () {
+      tekKapali = true;
       cokenler[secili] = true;
       ciz();
-      ozetYaz(secili);
+      var ad = parcaBul(secili).ad;
+      var veriYok = etkilenenler();
+      ozet.textContent =
+        ad + " çöktü. Tek programda bu hata bütün süreci kapattı: beş parçanın beşi durdu ve ancak program baştan başlatılınca geri gelir. " +
+        "Node grafiğinde çökme öteki süreçlere yayılmadı: yalnızca " + ad + " durdu" +
+        (veriYok.length ? "; " + veriYok.join(", ") + " çalışıyor ama veri alamıyor" : "; öteki node'lar hiç etkilenmedi") +
+        ". Orada yalnızca " + ad + " node'unu yeniden başlatman yeter.";
     });
-    sifirla.addEventListener("click", function () {
-      cokenler = {};
+
+    grafListe.addEventListener("click", function (olay) {
+      var dugme = olay.target.closest("button[data-yeniden]");
+      if (!dugme || dugme.disabled) return;
+      var kimlik = dugme.getAttribute("data-yeniden");
+      delete cokenler[kimlik];
       ciz();
-      ozet.textContent = "Bütün parçalar yeniden başlatıldı.";
+      ozet.textContent =
+        parcaBul(kimlik).ad + " yeniden başlatıldı; öteki node'lar bu sırada hiç kapanmadı." +
+        (tekKapali ? " Tek program hâlâ kapalı: orada tek bir parçayı yeniden başlatmanın yolu yok, bütün program baştan açılmalı." : "");
+    });
+
+    tekYeniden.addEventListener("click", function () {
+      if (!tekKapali) return;
+      tekKapali = false;
+      ciz();
+      ozet.textContent = "Program baştan başlatıldı: beş parçanın beşi birlikte yeniden açıldı.";
     });
 
     ciz();
