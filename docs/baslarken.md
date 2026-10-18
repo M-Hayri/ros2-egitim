@@ -28,7 +28,7 @@ Bu eğitimde ROS bilgisayarına kurulmaz. GitHub Codespaces, tarayıcıda içind
 
     Bütün satırlar `[TAMAM]` olmalı.
 
-4. Alt paneldeki **Ports** sekmesinde **6080** numaralı portun yanındaki küre simgesine bas. Tarayıcıda bir masaüstü açılır; parola: `ros`.
+4. Alt paneldeki **Ports** sekmesinde **6080** numaralı portun yanındaki küre simgesine bas. Tarayıcıda bir masaüstü açılır; parola sorulursa `ros` yaz.
 5. Terminalde kaplumbağa penceresini aç:
 
     ```bash

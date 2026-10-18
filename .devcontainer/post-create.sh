@@ -12,4 +12,4 @@ rosdep update --rosdistro jazzy || echo "[UYARI] rosdep update başarısız oldu
 
 echo
 echo "Ortam hazır. Kontrol için:  bash scripts/ortam_kontrol.sh"
-echo "Masaüstü: 'Ports' sekmesinde 6080 numaralı portu tarayıcıda açın (parola: ros)."
+echo "Masaüstü: 'Ports' sekmesinde 6080 numaralı portu tarayıcıda açın (parola sorulursa: ros)."

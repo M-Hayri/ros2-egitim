@@ -17,7 +17,7 @@ ROS 2'yi uygulayarak öğrenmek için açık kaynak, etkileşimli bir eğitim. M
    bash scripts/ortam_kontrol.sh
    ```
 
-3. **Ports** sekmesinde **6080** portunu tarayıcıda aç (masaüstü parolası: `ros`).
+3. **Ports** sekmesinde **6080** portunu tarayıcıda aç (parola sorulursa: `ros`).
 4. Kaplumbağayı çalıştır:
 
    ```bash
