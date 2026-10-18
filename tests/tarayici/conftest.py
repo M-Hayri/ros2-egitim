@@ -59,9 +59,10 @@ class Sayfa:
         page.on("pageerror", lambda e: self.konsol_hatalari.append(f"pageerror: {e}"))
         page.on("request", lambda r: self.istekler.append(r.url))
 
-    def ac(self, yol=KATALOG):
+    def ac(self, yol=KATALOG, bekle="[data-egitim-widget][data-egitim-hazir]"):
         self.page.goto(self.adres + yol, wait_until="load")
-        self.page.wait_for_selector("[data-egitim-widget][data-egitim-hazir]")
+        if bekle:
+            self.page.wait_for_selector(bekle)
         return self
 
 
@@ -77,15 +78,15 @@ def _dis_istekleri_karsila(route):
 
 @pytest.fixture
 def sayfa_ac(tarayici, site_adresi):
-    """sayfa_ac(genislik=..., tema="light"|"dark", depolama_kapali=False)"""
+    """sayfa_ac(genislik=..., tema="light"|"dark", depolama_kapali=False, hareket="reduce"|"no-preference")"""
     baglamlar = []
 
-    def ac(genislik=1280, yukseklik=900, tema="light", depolama_kapali=False, baglam=None):
+    def ac(genislik=1280, yukseklik=900, tema="light", depolama_kapali=False, baglam=None, hareket="reduce"):
         if baglam is None:
             baglam = tarayici.new_context(
                 viewport={"width": genislik, "height": yukseklik},
                 color_scheme=tema,
-                reduced_motion="reduce",
+                reduced_motion=hareket,
             )
             baglam.route(lambda u: not u.startswith(site_adresi), _dis_istekleri_karsila)
             if depolama_kapali:

@@ -43,7 +43,9 @@ dersler/              Her dersin başlangıç paketi ve testleri (çözüm kodu 
 ariza-lab/            Bilerek bozulmuş örnekler
 sablonlar/            Ders sayfası şablonu
 scripts/              Ortam kontrolü ve CI betikleri
-tests/tarayici/       Widget ve soru bileşenlerinin tarayıcı testleri (Playwright, Chromium)
+sorular/              Soru bankası: hatırla soruları (derleme anında sayfalara eklenir)
+tests/tarayici/       Widget, soru bileşeni ve sayfaların tarayıcı testleri (Playwright, Chromium)
+tests/icerik/         Ders sayfası şablonu, soru bankası ve komut koşucusu testleri
 ```
 
 ## Siteyi yerelde derlemek
@@ -63,6 +65,19 @@ python -m pytest tests/tarayici -v
 ```
 
 Ekran görüntüleri `tests/tarayici/ekran/` klasörüne yazılır.
+
+Ders sayfalarındaki her `bash` bloğunun önünde bir test işareti bulunur (`otomatik`, `arka-plan` ya da `elle`; ayrıntı `scripts/icerik_komutlari.py` dosyasının başında). İşaretleri ve sayfa yapısını denetlemek ROS gerektirmez:
+
+```bash
+python3 scripts/icerik_komutlari.py --denetle --listele
+python -m pytest tests/icerik -v
+```
+
+Komutların kendisi CI'da devcontainer içinde çalıştırılır (`scripts/ci_icerik.sh`). Codespace'te de elle çalıştırılabilir:
+
+```bash
+python3 scripts/icerik_komutlari.py --calistir
+```
 
 ## Katkı
 

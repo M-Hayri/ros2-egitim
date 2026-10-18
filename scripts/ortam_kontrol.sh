@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# Ortam kontrolü: ROS 2 Jazzy çalışma ortamının hazır olup olmadığını denetler.
+# Ortam kontrolü: bu betiği çalıştıran terminalde ROS 2 Jazzy ortamının hazır olup
+# olmadığını denetler (Ders 0.2).
 # Kullanım:  bash scripts/ortam_kontrol.sh
 # Çıkış kodu: tüm zorunlu kontroller geçerse 0, biri bile düşerse 1.
-
-if [ -f /opt/ros/jazzy/setup.bash ]; then
-  # shellcheck disable=SC1091
-  source /opt/ros/jazzy/setup.bash
-fi
+#
+# Betik ROS'u kendisi yüklemez (source etmez). Bilerek: çağıran terminal
+# `source /opt/ros/jazzy/setup.bash` yapmadıysa kontrollerin düşmesi gerekir.
+# Betik ayrı bir süreçte çalışır ve terminalin ortam değişkenlerini (PATH,
+# ROS_DISTRO ...) miras alır; denetlediği şey tam olarak bu mirastır.
 
 hata=0
 
@@ -39,5 +40,9 @@ if [ "$hata" -eq 0 ]; then
   echo "Sonuç: ortam hazır."
 else
   echo "Sonuç: en az bir kontrol düştü. Yukarıdaki [HATA] satırlarına bakın."
+  if [ -z "${ROS_DISTRO:-}" ]; then
+    echo "İpucu: bu terminalde ROS ortamı yüklenmemiş. Şunu çalıştırıp tekrar dene:"
+    echo "       source /opt/ros/jazzy/setup.bash"
+  fi
 fi
 exit "$hata"

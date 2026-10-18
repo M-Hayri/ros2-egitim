@@ -1,7 +1,11 @@
-# İçerik denetimi: siteyi katı modda derler ve widget/soru bileşenlerini gerçek bir
-# tarayıcıda (Chromium) test eder.
-# A2'den itibaren: ders sayfalarındaki komut bloklarını devcontainer içinde çalıştıracak
-# ve resmi doküman bağlantılarını kontrol edecek.
+# İçerik denetimi:
+#   site      — siteyi katı modda derler; komut bloklarının test işaretlerini ve ders
+#               sayfalarının şablonunu denetler (tests/icerik)
+#   baglanti  — dış bağlantılar; docs.ros.org/en/jazzy bağlantıları ros2_documentation
+#               deposundaki kaynak dosyayla doğrulanır, 403/429 uyarıdır (A2, S9)
+#   tarayici  — widget, soru bileşeni ve sayfalar gerçek bir tarayıcıda (Chromium)
+#   komutlar  — sayfalardaki komut blokları devcontainer içinde birebir (A2, S2–S3)
+# Bu oturumdan Actions günlükleri indirilemediği için sonuçlar notlara (annotations) da yazılır.
 name: İçerik denetimi
 
 on:
@@ -9,24 +13,30 @@ on:
     branches: [main]
     paths:
       - "docs/**"
+      - "sorular/**"
       - "mkdocs.yml"
       - "requirements-docs.txt"
       - "requirements-test.txt"
-      - "tests/tarayici/**"
+      - "tests/**"
+      - "scripts/**"
+      - ".devcontainer/**"
       - ".github/workflows/content.yml"
   pull_request:
     paths:
       - "docs/**"
+      - "sorular/**"
       - "mkdocs.yml"
       - "requirements-docs.txt"
       - "requirements-test.txt"
-      - "tests/tarayici/**"
+      - "tests/**"
+      - "scripts/**"
+      - ".devcontainer/**"
       - ".github/workflows/content.yml"
   workflow_dispatch:
 
 jobs:
   site:
-    name: Siteyi katı modda derle
+    name: Siteyi derle ve sayfaları denetle
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -34,9 +44,52 @@ jobs:
         with:
           python-version: "3.12"
       - name: Bağımlılıklar
-        run: pip install -r requirements-docs.txt
+        run: pip install -r requirements-docs.txt -r requirements-test.txt
       - name: mkdocs build --strict
         run: mkdocs build --strict
+      - name: Komut bloklarının test işaretleri
+        run: |
+          set -o pipefail
+          python scripts/icerik_komutlari.py --denetle --listele 2>&1 | tee isaretler.txt
+          echo "::notice title=Test işaretleri::$(head -1 isaretler.txt)"
+          grep -P "\telle\t" isaretler.txt | sed 's/^/::notice title=Elle doğrulanacak blok::/' || true
+      - name: Sayfa ve koşucu testleri
+        run: |
+          set -o pipefail
+          python -m pytest tests/icerik -v -s -p no:cacheprovider 2>&1 | tee icerik-sonuc.txt
+      - name: Sonuçları özetle
+        if: always()
+        run: |
+          ozet=$(grep -E "[0-9]+ (passed|failed)" icerik-sonuc.txt | tail -1 || true)
+          echo "::notice title=Sayfa ve koşucu testleri::${ozet:-sonuç satırı bulunamadı}"
+          kelime=$(grep -E "^\[kelime\]|\[kelime\]" icerik-sonuc.txt | sed 's/.*\[kelime\] //' | paste -sd ';' - || true)
+          echo "::notice title=Kavram kelime sayıları::${kelime:-yok}"
+          grep -E "^FAILED" icerik-sonuc.txt | sed 's/^/::error title=Düşen test::/' || true
+
+  baglanti:
+    name: Bağlantı denetimi
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Bağlantıları denetle
+        run: |
+          set -o pipefail
+          python scripts/baglanti_denetimi.py --rapor baglanti.json 2>&1 | tee baglanti.txt
+      - name: Sonuçları özetle
+        if: always()
+        run: |
+          {
+            echo "## Bağlantı denetimi"
+            echo '```'
+            cat baglanti.txt 2>/dev/null || echo "(çıktı yok)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice title=Bağlantı denetimi::$(tail -1 baglanti.txt 2>/dev/null)"
+          grep -E "^\[UYARI\]" baglanti.txt | sed 's/^/::warning title=Doğrulanamadı::/' || true
+          grep -E "^\[HATA\]" baglanti.txt | sed 's/^/::error title=Kırık bağlantı::/' || true
 
   tarayici:
     name: Tarayıcı testleri (Chromium)
@@ -68,6 +121,8 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           ozet=$(grep -E "[0-9]+ (passed|failed)" tarayici-sonuc.txt | tail -1 || true)
           echo "::notice title=Tarayıcı testleri::${ozet:-sonuç satırı bulunamadı}"
+          kontrast=$(grep -oE "\[kontrast\].*" tarayici-sonuc.txt | sed 's/\[kontrast\] //' | paste -sd ';' - || true)
+          echo "::notice title=Kontrast ölçümleri::${kontrast:-yok}"
           grep -E "^FAILED" tarayici-sonuc.txt | sed 's/^/::error title=Düşen test::/' || true
       - name: Ekran görüntülerini sakla
         if: always()
@@ -76,3 +131,39 @@ jobs:
           name: ekran-goruntuleri
           path: tests/tarayici/ekran/
           if-no-files-found: warn
+
+  komutlar:
+    name: Sayfa komutları devcontainer içinde
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v7
+
+      - name: Devcontainer'ı derle ve sayfa komutlarını çalıştır
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: bash scripts/ci_icerik.sh
+
+      - name: Sonuçları özetle
+        if: always()
+        run: |
+          {
+            echo "## Ortam betiği iki yönlü (S3)"
+            echo '```'
+            cat ci-sonuc/ortam-iki-yon.txt 2>/dev/null || echo "(çıktı yok)"
+            echo '```'
+            echo "## Sayfa komutları (S2)"
+            echo '```'
+            cat ci-sonuc/komutlar.txt 2>/dev/null || echo "(çıktı yok)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          s3=$(grep -E "^\[(GEÇTİ|DÜŞTÜ|BİLGİ)\]" ci-sonuc/ortam-iki-yon.txt 2>/dev/null | sed ':a;N;$!ba;s/\n/%0A/g')
+          echo "::notice title=Ortam betiği iki yönlü::${s3:-çıktı yok}"
+          s2=$(grep -E "^\[(GEÇTİ|DÜŞTÜ|ELLE)" ci-sonuc/komutlar.txt 2>/dev/null | sed ':a;N;$!ba;s/\n/%0A/g')
+          echo "::notice title=Sayfa komutları::${s2:-çıktı yok}"
+          echo "::notice title=Sayfa komutları özeti::$(grep -E '^İçerik komutları:' ci-sonuc/komutlar.txt 2>/dev/null | tail -1)"
+          # Düşen her blok için çıktısının son satırları ayrı bir not olarak.
+          awk '/^\[DÜŞTÜ\]/{if(b!="")print b; b=$0; next} /^         /{if(b!="")b=b"%0A"$0; next} {if(b!=""){print b; b=""}} END{if(b!="")print b}' \
+            ci-sonuc/komutlar.txt ci-sonuc/ortam-iki-yon.txt 2>/dev/null | cut -c1-4000 | sed 's/^/::error title=Düşen blok::/' || true

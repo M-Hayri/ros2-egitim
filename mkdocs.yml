@@ -33,6 +33,10 @@ theme:
         icon: material/weather-sunny
         name: Açık temaya geç
 
+# Soru bankası docs/ dışında; mkdocs serve değişiklikleri izlesin.
+watch:
+  - sorular
+
 extra_css:
   - assets/egitim/egitim.css
 
@@ -52,13 +56,23 @@ markdown_extensions:
   - pymdownx.highlight
   - pymdownx.inlinehilite
   - pymdownx.superfences
+  # Soru bankası: sorular/<kimlik>.md dosyaları derleme anında sayfaya eklenir.
+  # check_paths: eksik dosya derlemeyi düşürür.
+  - pymdownx.snippets:
+      base_path: [sorular]
+      check_paths: true
   - pymdownx.tasklist:
       custom_checkbox: true
 
 nav:
   - Ana sayfa: index.md
+  - Hazır mısın?: hazir-misin.md
   - Başlamadan önce: baslarken.md
-  - Seviye 0 · Giriş: seviye-0/index.md
+  - Seviye 0 · Giriş:
+      - seviye-0/index.md
+      - 0.1 ROS 2 neden var: seviye-0/0-1-ros2-neden-var.md
+      - 0.2 Ortam ve ros2 komutu: seviye-0/0-2-ortam-ve-ros2.md
+      - 0.3 Turtlesim ve rqt: seviye-0/0-3-turtlesim-ve-rqt.md
   - Seviye 1 · İletişim: seviye-1/index.md
   - Seviye 2 · Etkileşim: seviye-2/index.md
   - Seviye 3 · Sistem kurmak: seviye-3/index.md

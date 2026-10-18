@@ -18,6 +18,7 @@
   --eg-yanlis-zemin: #fce8e6;
   --eg-uyari: #8a5300;
   --eg-uyari-zemin: #fff4e0;
+  --eg-akis: #00727d;
 }
 
 [data-md-color-scheme="slate"] {
@@ -27,6 +28,7 @@
   --eg-yanlis-zemin: #3d1d1b;
   --eg-uyari: #ffd27a;
   --eg-uyari-zemin: #3a2d12;
+  --eg-akis: #5fd8e6;
 }
 
 .eg-kutu {
@@ -55,13 +57,19 @@
   box-sizing: border-box;
 }
 
+/* hidden niteliği, display tanımlayan sınıfların (ör. .eg-dugme) önüne geçmeli. */
+.eg-kutu [hidden] {
+  display: none !important;
+}
+
 .eg-etiket {
   display: inline-block;
   margin-bottom: 0.5rem;
   padding: 0.1rem 0.5rem;
   border-radius: 1rem;
   background: var(--eg-ikincil-zemin);
-  color: var(--eg-soluk);
+  /* Soluk renk, ikincil zeminde 4,5:1'in altında kalıyordu (A2'de düzeltilen ölçümle bulundu). */
+  color: var(--eg-yazi);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -347,7 +355,7 @@
 }
 
 .eg-graf-kenar[data-akiyor="evet"] {
-  stroke: var(--eg-vurgu);
+  stroke: var(--eg-akis);
   opacity: 1;
   animation: eg-akis 0.9s linear infinite;
 }
@@ -366,6 +374,55 @@
   .eg-graf-kenar[data-akiyor="evet"] {
     animation: none;
   }
+}
+
+.eg-lejant {
+  margin: 0 0 0.5rem;
+  color: var(--eg-soluk);
+  font-size: 0.68rem;
+}
+
+.eg-panel-eylem {
+  margin: 0.5rem 0 0;
+}
+
+/* Node grafiği listesi: ad ve durum solda alt alta, "Yeniden başlat" sağda sabit
+   genişlikte bir sütunda. Düğme yalnızca node çökmüşken görünür (görünür = etkin);
+   yer tutmaya devam ettiği için satırlar her genişlikte aynı hizada kalır. */
+.eg-durum-listesi li.eg-satir-dugmeli {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6.75rem;
+  grid-template-areas:
+    "ad dugme"
+    "durum dugme";
+  align-items: center;
+  gap: 0.1rem 0.6rem;
+}
+
+.eg-satir-dugmeli > .eg-parca-adi {
+  grid-area: ad;
+}
+
+.eg-satir-dugmeli > .eg-durum {
+  grid-area: durum;
+  margin-left: 0;
+  text-align: left;
+}
+
+.eg-satir-dugmeli > .eg-dugme {
+  grid-area: dugme;
+  justify-self: stretch;
+  justify-content: center;
+}
+
+.eg-satir-dugmeli > .eg-dugme[disabled] {
+  visibility: hidden;
+}
+
+.eg-dugme--kucuk {
+  min-height: 1.8rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.68rem;
 }
 
 .eg-ozet {

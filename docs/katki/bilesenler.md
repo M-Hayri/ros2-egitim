@@ -32,27 +32,40 @@ Açıklama metni buraya.
 </div>
 ```
 
-`data-tur` iki değer alır: `tahmin` (Tahmin et adımı) ve `hatirla` (Hatırla adımı). Cevaplar not etkisi olmayan öz yoklamadır; yalnızca kişinin kendi tarayıcısında tutulur. Tarayıcı depolaması kapalıysa soru yine çalışır, yalnızca cevabı hatırlamaz.
+`data-tur` üç değer alır: `tahmin` (Tahmin et adımı), `hatirla` (Hatırla adımı) ve `yoklama` (ders dışı öz yoklama, örneğin "Hazır mısın?" sayfası). Cevaplar not etkisi olmayan öz yoklamadır; yalnızca kişinin kendi tarayıcısında tutulur. Tarayıcı depolaması kapalıysa soru yine çalışır, yalnızca cevabı hatırlamaz.
 
 ### Örnek: tahmin sorusu
 
 <div class="egitim-soru" data-soru-id="katalog-tahmin" data-tur="tahmin" data-dogru="2" markdown>
 Teslimat robotunun beş node'undan `kamera` çökerse öteki dört node ne yapar?
 
-1. Hepsi hemen durur.
+1. Hepsi hemen durur; tek bir node çökünce ROS bütün sistemi kapatır.
 2. Kendi süreçlerinde çalışmaya devam eder; kameradan veri bekleyenlere veri gelmez.
-3. Kamera kendiliğinden yeniden başlar, kimse fark etmez.
+3. Kamera kendiliğinden yeniden başlar; öteki node'lar hiçbir şey fark etmez.
 
 Node'lar ayrı süreçlerde çalıştığı için birinin çökmesi ötekileri kapatmaz. Ama kameranın yayınladığı veriyi dinleyen node'lar artık yeni mesaj almaz. Yeniden başlatma kendiliğinden olmaz; bunu launch dosyasında ayrıca istemek gerekir (Seviye 3).
 </div>
 
-### Örnek: hatırlama sorusu
+### Örnek: hatırlama sorusu (soru bankasından)
 
-<div class="egitim-soru" data-soru-id="katalog-hatirla" data-tur="hatirla" data-dogru="3" markdown>
-Programı küçük node'lara bölmenin en doğrudan kazancı hangisi?
+Hatırla soruları sonraki derslerin açılışında yeniden sorulduğu için sayfaya yazılmaz, `sorular/` klasöründe kendi dosyasında durur. Dosya, kimliği ve doğru cevabıyla birlikte soru div'inin tamamını taşır. Sayfaya derleme anında tek satırla eklenir; tarayıcıda ağ isteği olmaz. Dosya yoksa `mkdocs build --strict` düşer.
 
-1. Program daha hızlı çalışır.
-2. Daha az kod yazılır.
-3. Bir parça çökünce ya da değişince ötekiler etkilenmeden kalabilir.
-4. Ağ trafiği azalır.
+```text
+;--8<-- "katalog-hatirla.md"
+```
+
+--8<-- "katalog-hatirla.md"
+
+## Tekrar sorusu
+
+Her ders, kendisinden iki önceki dersin hatırla sorularından ikisiyle açılır (0.3, 0.1'den; 1.1, 0.2'den). Aynı soru dosyası `egitim-tekrar` kabının içine eklenir. Kabın içindeki soru, kayıtlı cevapla dolu gelmez ve cevabı kaydetmez; asıl dersteki kayıt değişmez. Aşağıda, yukarıdaki sorunun tekrar hâli var: yukarıda cevap verip sayfayı yenilesen bile bu kutu boş gelir.
+
+```html
+<div class="egitim-tekrar" markdown>
+;--8<-- "katalog-hatirla.md"
+</div>
+```
+
+<div class="egitim-tekrar" markdown>
+--8<-- "katalog-hatirla.md"
 </div>

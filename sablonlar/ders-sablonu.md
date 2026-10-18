@@ -3,7 +3,7 @@ DERS SAYFASI ŞABLONU
 Yeni ders: bu dosyayı docs/seviye-N/ altına "N-M-kisa-ad.md" adıyla kopyala, mkdocs.yml nav'ına ekle.
 Kurallar: örnekler nötr olur (araca özgü içerik yok); teori bölümü 800 kelimeyi geçmez;
 sayfadaki her komut devcontainer içinde test edilir; resmi doküman yeniden yazılmaz, bağlantı verilir.
-Aşağıdaki 13 alanın hepsi doldurulur; kullanılmayan alan silinmez, "Yok" yazılır.
+Aşağıdaki 13 alanın hepsi doldurulur; kullanılmayan alan silinmez, "Bu derste yok." ve gerekçesi yazılır.
 -->
 
 # N.M Ders adı
@@ -15,6 +15,19 @@ Aşağıdaki 13 alanın hepsi doldurulur; kullanılmayan alan silinmez, "Yok" ya
 
 <!-- 2. Öğrenme hedefi: tek cümle, ölçülebilir fiil (yazar, çalıştırır, açıklar, bulur…) -->
 **Hedef:** Bu dersin sonunda …
+
+<!-- İsteğe bağlı: Açılış. n. ders, n−2. dersin hatırla sorularından 2 tanesiyle açılır
+(0.3 ← 0.1, 1.1 ← 0.2 …). 0.1 ve 0.2'de bu bölüm yoktur.
+
+## Açılış: tekrar
+
+<div class="egitim-tekrar" markdown>
+;--8<-- "dX-Y-hatirla-1.md"
+
+;--8<-- "dX-Y-hatirla-2.md"
+</div>
+(Yukarıdaki satırlarda ';' işaretini kaldır.)
+-->
 
 ## Bağlam
 
@@ -42,10 +55,14 @@ Açıklama.
 
 ## Çalıştır
 
-<!-- 6. "Codespaces'te aç" bağlantısı ve test edilmiş komutlar -->
+<!-- 6. Test edilmiş komutlar. Her bash bloğunun önünde bir test işareti olur; ayrıntı
+scripts/icerik_komutlari.py dosyasının başında: otomatik (desen, cikis, terminal),
+arka-plan (hazir, desen, sure), elle (neden; blok başlığı "Test edilmedi" ya da
+"Elle doğrulandı (kim, tarih)" ile başlar). -->
 
+<!-- test: otomatik; desen: ^beklenen satır$ -->
 ```bash
-# komutlar
+komut
 ```
 
 ## İncele
@@ -68,11 +85,14 @@ Açıklama.
 
 ## Hatırla
 
-<!-- 11. Üç kısa soru; her biri data-tur="hatirla" olan bir soru bileşeni (kimlikler: dX-Y-hatirla-1, -2, -3). -->
+<!-- 11. Üç kısa soru. Her biri sorular/dX-Y-hatirla-N.md dosyasında, data-tur="hatirla"
+olan bir soru bileşeni; sayfaya snippet satırıyla eklenir (';' işaretini kaldır). -->
 
-1. …
-2. …
-3. …
+;--8<-- "dX-Y-hatirla-1.md"
+
+;--8<-- "dX-Y-hatirla-2.md"
+
+;--8<-- "dX-Y-hatirla-3.md"
 
 ## Resmi doküman
 

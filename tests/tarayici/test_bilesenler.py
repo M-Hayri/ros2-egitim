@@ -120,12 +120,17 @@ def test_w2_cokertince_beklenen_parcalar_duruyor(sayfa_ac, parca):
 
 
 def test_w2_yeniden_baslat_her_seyi_geri_getirir(sayfa_ac):
+    # A2 notu: A1'deki ortak "Hepsini yeniden başlat" düğmesi S4 gereği kaldırıldı.
+    # Testin amacı aynı (yeniden başlatma her şeyi geri getirir); yalnızca basılan
+    # düğmeler değişti: her çöken node'un kendi düğmesi ve "Programı yeniden başlat".
     s = sayfa_ac().ac()
     p = s.page
     for parca in ["kamera", "kayitci"]:
         p.click(f'.eg-tng-secim button[data-parca="{parca}"]')
         p.click('button[data-eylem="cokert"]')
-    p.click('button[data-eylem="sifirla"]')
+    for parca in ["kamera", "kayitci"]:
+        p.click(f'button[data-yeniden="{parca}"]')
+    p.click('button[data-eylem="program-yeniden"]')
     assert set(_durumlar(p, "tek-program").values()) == {"calisiyor"}
     assert "durdu" not in _durumlar(p, "node-grafigi").values()
     assert _robot(p, "node-grafigi") == "evet"
@@ -208,16 +213,19 @@ def test_w4_tema_ekran_goruntusu_ve_kontrast(sayfa_ac, tema, sema):
 
         cifler = p.evaluate(
             """() => {
-              const rgb = s => s.match(/\\d+(\\.\\d+)?/g).slice(0, 3).map(Number);
+              // rgba(...) dördüncü değeri alfa: yarı saydam yazı rengi zemine karıştırılmalı.
+              const rgba = s => { const n = s.match(/\\d+(\\.\\d+)?/g).map(Number); return [n[0], n[1], n[2], n.length > 3 ? n[3] : 1]; };
+              const rgb = s => rgba(s).slice(0, 3);
               const zemin = e => { while (e) { const c = getComputedStyle(e).backgroundColor;
                   if (c && !c.endsWith(', 0)') && c !== 'transparent') return rgb(c); e = e.parentElement; }
                 return [255, 255, 255]; };
               return [...document.querySelectorAll(
-                  '.eg-durum, .eg-robot, .eg-geri-bildirim, .eg-not, .eg-etiket, .eg-secenek, .eg-parca-adi, .eg-aciklama p')]
+                  '.eg-durum, .eg-robot, .eg-geri-bildirim, .eg-not, .eg-etiket, .eg-secenek, .eg-parca-adi, .eg-aciklama p, .eg-lejant')]
                 .filter(e => e.offsetParent !== null && e.textContent.trim())
                 .map(e => { let o = 1; for (let a = e; a; a = a.parentElement) o *= +getComputedStyle(a).opacity;
-                  const z = zemin(e), y = rgb(getComputedStyle(e).color);
-                  // Opaklık, yazıyı zemine karıştırır: etkin renk = o*yazı + (1-o)*zemin.
+                  const z = zemin(e), r = rgba(getComputedStyle(e).color), y = r.slice(0, 3);
+                  o *= r[3];
+                  // Opaklık ve renk alfası yazıyı zemine karıştırır: etkin renk = o*yazı + (1-o)*zemin.
                   return {ad: e.className, yazi: y.map((c, i) => o * c + (1 - o) * z[i]), zemin: z}; });
             }"""
         )
@@ -310,7 +318,10 @@ def test_w5_etkilesim_ag_istegi_yapmaz(sayfa_ac):
     for parca in PARCALAR:
         p.click(f'.eg-tng-secim button[data-parca="{parca}"]')
         p.click('button[data-eylem="cokert"]')
-    p.click('button[data-eylem="sifirla"]')
+    # A2 notu: ortak sıfırlama düğmesi kalktı; aynı etkileşim yeni düğmelerle yapılıyor.
+    for parca in PARCALAR:
+        p.click(f'button[data-yeniden="{parca}"]')
+    p.click('button[data-eylem="program-yeniden"]')
     p.wait_for_timeout(500)
     assert s.istekler[once:] == []
     assert s.konsol_hatalari == []
