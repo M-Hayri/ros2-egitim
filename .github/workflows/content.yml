@@ -1,14 +1,26 @@
-# İçerik denetimi. A0'da yalnızca siteyi katı modda derler.
+# İçerik denetimi: siteyi katı modda derler ve widget/soru bileşenlerini gerçek bir
+# tarayıcıda (Chromium) test eder.
 # A2'den itibaren: ders sayfalarındaki komut bloklarını devcontainer içinde çalıştıracak
 # ve resmi doküman bağlantılarını kontrol edecek.
 name: İçerik denetimi
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - "requirements-test.txt"
+      - "tests/tarayici/**"
+      - ".github/workflows/content.yml"
   pull_request:
     paths:
       - "docs/**"
       - "mkdocs.yml"
       - "requirements-docs.txt"
+      - "requirements-test.txt"
+      - "tests/tarayici/**"
       - ".github/workflows/content.yml"
   workflow_dispatch:
 
@@ -25,3 +37,42 @@ jobs:
         run: pip install -r requirements-docs.txt
       - name: mkdocs build --strict
         run: mkdocs build --strict
+
+  tarayici:
+    name: Tarayıcı testleri (Chromium)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Bağımlılıklar
+        run: |
+          pip install -r requirements-docs.txt -r requirements-test.txt
+          python -m playwright install --with-deps chromium
+      - name: mkdocs build --strict
+        run: mkdocs build --strict
+      - name: Tarayıcı testleri
+        run: |
+          set -o pipefail
+          python -m pytest tests/tarayici -v -s -p no:cacheprovider 2>&1 | tee tarayici-sonuc.txt
+      - name: Sonuçları özetle
+        if: always()
+        run: |
+          {
+            echo "## Tarayıcı testleri"
+            echo '```'
+            grep -E "PASSED|FAILED|ERROR|kontrast\]|passed|failed" tarayici-sonuc.txt || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          ozet=$(grep -E "[0-9]+ (passed|failed)" tarayici-sonuc.txt | tail -1 || true)
+          echo "::notice title=Tarayıcı testleri::${ozet:-sonuç satırı bulunamadı}"
+          grep -E "^FAILED" tarayici-sonuc.txt | sed 's/^/::error title=Düşen test::/' || true
+      - name: Ekran görüntülerini sakla
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ekran-goruntuleri
+          path: tests/tarayici/ekran/
+          if-no-files-found: warn

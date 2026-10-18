@@ -13,3 +13,5 @@ __pycache__/
 *.swp
 # CI çıktıları
 ci-sonuc/
+# Tarayıcı testlerinin ekran görüntüleri
+tests/tarayici/ekran/

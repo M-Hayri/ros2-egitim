@@ -22,11 +22,23 @@ Aşağıdaki 13 alanın hepsi doldurulur; kullanılmayan alan silinmez, "Yok" ya
 
 ## Kavram
 
-<!-- 4. En fazla 800 kelime. Widget varsa sayfaya gömülür. -->
+<!-- 4. En fazla 800 kelime. Widget varsa tek satırla gömülür:
+<div data-egitim-widget="widget-adi"></div>
+Mevcut widget'lar ve kullanım: docs/katki/bilesenler.md -->
 
 ## Tahmin et
 
-<!-- 5. Çalıştırmadan önce cevaplanan soru. Cevap seçenekleri ve doğru cevabın açıklaması. -->
+<!-- 5. Çalıştırmadan önce cevaplanan soru. Soru bileşeniyle yazılır (docs/katki/bilesenler.md):
+ilk paragraf soru, ilk numaralı liste seçenekler, sonrası açıklama. data-soru-id site genelinde tek. -->
+
+<div class="egitim-soru" data-soru-id="dX-Y-tahmin" data-tur="tahmin" data-dogru="1" markdown>
+Soru metni?
+
+1. Doğru seçenek
+2. Yanlış seçenek
+
+Açıklama.
+</div>
 
 ## Çalıştır
 
@@ -56,7 +68,7 @@ Aşağıdaki 13 alanın hepsi doldurulur; kullanılmayan alan silinmez, "Yok" ya
 
 ## Hatırla
 
-<!-- 11. Üç kısa soru -->
+<!-- 11. Üç kısa soru; her biri data-tur="hatirla" olan bir soru bileşeni (kimlikler: dX-Y-hatirla-1, -2, -3). -->
 
 1. …
 2. …
