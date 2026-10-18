@@ -30,6 +30,22 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           push: never
-          runCmd: |
-            bash scripts/ortam_kontrol.sh
-            bash scripts/ci_test.sh
+          runCmd: bash scripts/ci_hepsi.sh
+
+      - name: Sonuçları özetle
+        if: always()
+        run: |
+          {
+            echo "## Ortam kontrolü"
+            echo '```'
+            cat ci-sonuc/ortam.txt 2>/dev/null || echo "(çıktı yok)"
+            echo '```'
+            echo "## Test sonuçları"
+            echo '```'
+            grep -E "^Summary:|tests, .* errors, .* failures" ci-sonuc/test.txt 2>/dev/null || echo "(çıktı yok)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          ortam=$(grep -E "^\[(TAMAM|HATA)\]|^Sonuç:" ci-sonuc/ortam.txt 2>/dev/null | sed ':a;N;$!ba;s/\n/%0A/g')
+          test=$(grep -E "^Summary:" ci-sonuc/test.txt 2>/dev/null | tail -1)
+          echo "::notice title=Ortam kontrolü::${ortam:-çıktı yok}"
+          echo "::notice title=Test sonuçları::${test:-çıktı yok}"

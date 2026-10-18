@@ -11,3 +11,5 @@ __pycache__/
 # Editör
 .vscode/
 *.swp
+# CI çıktıları
+ci-sonuc/
