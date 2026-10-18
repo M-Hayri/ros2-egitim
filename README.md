@@ -1,10 +1,10 @@
 # Mavi Gölge ROS 2 Eğitimi
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/SAHIP/DEPO)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/M-Hayri/ros2-egitim)
 
 ROS 2'yi uygulayarak öğrenmek için açık kaynak, etkileşimli bir eğitim. Mavi Gölge yazılım ekibi için hazırlandı; herkesin kullanımına açık.
 
-- **Site:** https://SAHIP.github.io/DEPO/
+- **Site:** https://M-Hayri.github.io/ros2-egitim/
 - **ROS sürümü:** ROS 2 Jazzy, Python (rclpy)
 - **Çalışma ortamı:** GitHub Codespaces (kurulum yok, tarayıcıda Linux + ROS 2 + masaüstü)
 

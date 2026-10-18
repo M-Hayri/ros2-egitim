@@ -2,8 +2,8 @@ site_name: Mavi Gölge ROS 2 Eğitimi
 site_description: ROS 2'yi uygulayarak öğrenmek için açık kaynak, etkileşimli eğitim.
 site_author: Mavi Gölge Yazılım Ekibi
 # Depo adresi belli olunca scripts/depo_adini_ayarla.sh bu satırları doldurur.
-# repo_url: https://github.com/SAHIP/DEPO
-# edit_uri: edit/main/docs/
+repo_url: https://github.com/M-Hayri/ros2-egitim
+edit_uri: edit/main/docs/
 
 copyright: Kod MIT, içerik CC BY 4.0 lisanslıdır.
 
